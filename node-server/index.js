@@ -2,11 +2,13 @@ import express from 'express';
 import path from 'path';
 import cors from 'cors';
 import connectDB from './configs/dbConnection.js';
-import authRoute from './routers/authRoute.js';
-import userRoute from './routers/userRoute.js';
-import adminRoute from './routers/adminRoute.js';
+import authRoute from './routes/authRoute.js';
+import userRoute from './routes/userRoute.js';
+import adminRoute from './routes/adminRoute.js';
+import postRoute from './routes/postRoute.js';
 import dotenv from 'dotenv';
 import {notFound, errorHandler} from './middlewares/expressMiddleware.js';
+import protect from './middlewares/authMiddleware.js'
 
 const app = express();
 const __dirname = path.resolve();
@@ -24,7 +26,7 @@ app.use('/images', express.static(__dirname + '/public'));
 
 //Cors configuration using "cors" middleware.
 var corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: 'http://localhost:8080',
     optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 app.use(cors(corsOptions));
@@ -43,8 +45,9 @@ app.listen(PORT, () => console.log(`Node server is running on port: ${PORT}`)).o
 
 //Routes
 app.use("/auth", authRoute);
-app.use("/user", userRoute);
-app.use("/admin", adminRoute);
+app.use("/post", postRoute);
+app.use("/user", protect, userRoute);
+app.use("/admin", protect, adminRoute);
 
 app.use(notFound);
 

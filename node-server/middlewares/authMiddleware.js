@@ -1,6 +1,9 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel.js';
 import asyncHandler from 'express-async-handler';
+import { UserTypes } from '../constants/modelConstants.js';
+import { adminProtectedRoutes } from '../constants/protectedRoutesData.js';
+import { StatusCodes } from 'http-status-codes';
 
 const protect = asyncHandler(async (req, res, next) => {
   let rejectReason;
@@ -26,7 +29,8 @@ const protect = asyncHandler(async (req, res, next) => {
               password: 0,
             });
             if (user) {
-              if (!user.isAdmin && req.originalUrl.startsWith('/admin')) {
+              let isAdminRoute = adminProtectedRoutes.find(e => req.originalUrl.startsWith(e));
+              if (user.userType == UserTypes.USER && isAdminRoute) {
                 rejectReason = "Insufficient permission";
               } else {
                 req.user = user;
@@ -47,7 +51,7 @@ const protect = asyncHandler(async (req, res, next) => {
   }
 
   if (rejectReason) {
-    res.status(401);
+    res.status(StatusCodes.UNAUTHORIZED);
     throw new Error(`Not authorized, ${rejectReason}`);
   }
   next();

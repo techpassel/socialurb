@@ -1,5 +1,5 @@
 import express from 'express';
-import { authenticateUser, publicMethod, registerUser } from '../controllers/authController.js';
+import { authenticateUser, registerUser } from '../controllers/authController.js';
 
 const router = express.Router();
 
@@ -8,7 +8,6 @@ const router = express.Router();
 //     res.send("Auth router is accessibale.")
 // })
 
-router.get("/", publicMethod);
 router.post("/register", registerUser);
 router.post("/login", authenticateUser);
 
